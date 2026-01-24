@@ -1,4 +1,4 @@
-// File: prisma/schema.prisma
+// prisma/schema.prisma
 
 generator client {
   provider = "prisma-client-js"
@@ -6,12 +6,8 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
-// --- TABEL DATA ---
-
-// 1. Tabel User (Karyawan/Admin)
 model User {
   id        String   @id @default(uuid())
   name      String
@@ -19,29 +15,21 @@ model User {
   password  String
   role      Role     @default(EMPLOYEE) 
   createdAt DateTime @default(now())
-  
-  // Relasi: Satu user punya banyak log
   logs      LogActivity[]
 }
 
-// 2. Tabel Log (Laporan Harian)
 model LogActivity {
   id          String    @id @default(uuid())
   title       String
-  description String    @db.Text
+  description String
   date        DateTime  @default(now())
-  duration    Int       // Durasi dalam menit
+  duration    Int
   status      LogStatus @default(SUBMITTED)
-  mood        String?   // Emoticon (😊, 🤯)
-  
-  // Relasi: Log ini punya siapa?
+  mood        String?
   userId      String
   user        User      @relation(fields: [userId], references: [id])
-
   createdAt   DateTime  @default(now())
 }
-
-// --- TIPE DATA KHUSUS (ENUM) ---
 
 enum Role {
   ADMIN
