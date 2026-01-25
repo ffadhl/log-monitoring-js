@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { LogOut, User } from 'lucide-react'
 import Image from 'next/image'
-import lotteImg from '@/public/assets/images/logo_lotte_horizontal.png'
+import lotteImg from '@/public/assets/images/lotte_chemical_horizontal.png'
 
 interface NavbarProps {
   user: {
@@ -28,7 +28,7 @@ export function Navbar({ user }: NavbarProps) {
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Image
-            src="/assets/images/lotte_chemical_horizontal.png"
+            src={lotteImg}
             alt="PT Lotte Chemical Indonesia"
             width={180}
             height={40}
