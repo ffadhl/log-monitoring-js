@@ -37,9 +37,9 @@ const moodEmoji: Record<string, string> = {
 }
 
 const statusStyles: Record<string, { bg: string; text: string; icon: typeof CheckCircle }> = {
-  DRAFT: { bg: 'bg-slate-500/20', text: 'text-slate-400', icon: AlertCircle },
-  SUBMITTED: { bg: 'bg-blue-500/20', text: 'text-blue-400', icon: Clock },
-  REVIEWED: { bg: 'bg-green-500/20', text: 'text-green-400', icon: CheckCircle },
+  DRAFT: { bg: 'bg-gray-100', text: 'text-gray-600', icon: AlertCircle },
+  SUBMITTED: { bg: 'bg-blue-50', text: 'text-blue-600', icon: Clock },
+  REVIEWED: { bg: 'bg-green-50', text: 'text-green-600', icon: CheckCircle },
 }
 
 export function LogCard({ log, onEdit, onDelete, onReview, showUser, isAdmin }: LogCardProps) {
@@ -56,7 +56,7 @@ export function LogCard({ log, onEdit, onDelete, onReview, showUser, isAdmin }: 
   }
 
   return (
-    <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 hover:border-slate-600 transition">
+    <div className="bg-white border border-gray-200 rounded-xl p-4 hover:border-gray-300 hover:shadow-md transition shadow-sm">
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
@@ -69,19 +69,19 @@ export function LogCard({ log, onEdit, onDelete, onReview, showUser, isAdmin }: 
                 {moodEmoji[log.mood] || '😊'}
               </span>
             )}
-            <span className="text-xs text-slate-500 flex items-center gap-1">
+            <span className="text-xs text-gray-400 flex items-center gap-1">
               <Clock className="w-3 h-3" />
               {formatDuration(log.duration)}
             </span>
           </div>
 
-          <h3 className="text-white font-medium mb-1">{log.title}</h3>
-          <p className="text-slate-400 text-sm mb-2 line-clamp-2">{log.description}</p>
+          <h3 className="text-gray-900 font-medium mb-1">{log.title}</h3>
+          <p className="text-gray-500 text-sm mb-2 line-clamp-2">{log.description}</p>
 
-          <div className="flex items-center gap-3 text-xs text-slate-500">
+          <div className="flex items-center gap-3 text-xs text-gray-400">
             <span>{format(new Date(log.date), 'EEEE, d MMMM yyyy', { locale: id })}</span>
             {showUser && log.user && (
-              <span className="text-blue-400">oleh {log.user.name}</span>
+              <span className="text-red-600">oleh {log.user.name}</span>
             )}
           </div>
         </div>
@@ -92,7 +92,7 @@ export function LogCard({ log, onEdit, onDelete, onReview, showUser, isAdmin }: 
               onClick={() => onEdit(log)}
               variant="ghost"
               size="sm"
-              className="text-slate-400 hover:text-blue-400 hover:bg-blue-500/10"
+              className="text-gray-400 hover:text-blue-600 hover:bg-blue-50"
             >
               <Edit className="w-4 h-4" />
             </Button>
@@ -102,7 +102,7 @@ export function LogCard({ log, onEdit, onDelete, onReview, showUser, isAdmin }: 
               onClick={() => onDelete(log.id)}
               variant="ghost"
               size="sm"
-              className="text-slate-400 hover:text-red-400 hover:bg-red-500/10"
+              className="text-gray-400 hover:text-red-600 hover:bg-red-50"
             >
               <Trash2 className="w-4 h-4" />
             </Button>
@@ -111,7 +111,7 @@ export function LogCard({ log, onEdit, onDelete, onReview, showUser, isAdmin }: 
             <Button
               onClick={() => onReview(log.id, 'REVIEWED')}
               size="sm"
-              className="bg-green-600 hover:bg-green-700 text-xs"
+              className="bg-green-600 hover:bg-green-700 text-white text-xs"
             >
               ✓ Review
             </Button>

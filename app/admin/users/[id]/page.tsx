@@ -137,7 +137,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-slate-400">Memuat data...</div>
+        <div className="text-gray-500">Memuat data...</div>
       </div>
     )
   }
@@ -145,7 +145,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
   if (!userInfo) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-slate-400">User tidak ditemukan</div>
+        <div className="text-gray-500">User tidak ditemukan</div>
       </div>
     )
   }
@@ -164,7 +164,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
           onClick={() => router.push('/admin')}
           variant="ghost"
           size="sm"
-          className="text-slate-400 hover:text-white"
+          className="text-gray-500 hover:text-gray-900"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Kembali
@@ -172,15 +172,15 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
       </div>
 
       {/* User Info */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
+      <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center">
-            <User className="w-8 h-8 text-blue-400" />
+          <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center">
+            <User className="w-8 h-8 text-red-600" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-white">{userInfo.name}</h1>
-            <p className="text-slate-400">{userInfo.email}</p>
-            <p className="text-xs text-slate-500 mt-1">
+            <h1 className="text-2xl font-bold text-gray-900">{userInfo.name}</h1>
+            <p className="text-gray-500">{userInfo.email}</p>
+            <p className="text-xs text-gray-400 mt-1">
               Bergabung {format(new Date(userInfo.createdAt), 'd MMMM yyyy', { locale: localeId })}
             </p>
           </div>
@@ -188,22 +188,22 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
       </div>
 
       {/* Date Filter */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
+      <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
         <div className="flex items-center gap-4 flex-wrap">
-          <Calendar className="w-5 h-5 text-slate-400" />
+          <Calendar className="w-5 h-5 text-gray-400" />
           <div className="flex items-center gap-2">
             <input
               type="date"
               value={dateRange.startDate}
               onChange={(e) => setDateRange({ ...dateRange, startDate: e.target.value })}
-              className="px-3 py-1.5 bg-slate-700/50 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-1.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
             />
-            <span className="text-slate-400">sampai</span>
+            <span className="text-gray-500">sampai</span>
             <input
               type="date"
               value={dateRange.endDate}
               onChange={(e) => setDateRange({ ...dateRange, endDate: e.target.value })}
-              className="px-3 py-1.5 bg-slate-700/50 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-1.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
             />
           </div>
         </div>
@@ -211,62 +211,62 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
+        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-500/20 rounded-lg">
-              <FileText className="w-5 h-5 text-blue-400" />
+            <div className="p-2 bg-blue-50 rounded-lg">
+              <FileText className="w-5 h-5 text-blue-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-white">{stats.totalLogs}</p>
-              <p className="text-xs text-slate-400">Total Log</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.totalLogs}</p>
+              <p className="text-xs text-gray-500">Total Log</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
+        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-500/20 rounded-lg">
-              <TrendingUp className="w-5 h-5 text-green-400" />
+            <div className="p-2 bg-green-50 rounded-lg">
+              <TrendingUp className="w-5 h-5 text-green-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-white">{stats.weeklyLogs}</p>
-              <p className="text-xs text-slate-400">Minggu Ini</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.weeklyLogs}</p>
+              <p className="text-xs text-gray-500">Minggu Ini</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
+        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-amber-500/20 rounded-lg">
-              <AlertCircle className="w-5 h-5 text-amber-400" />
+            <div className="p-2 bg-amber-50 rounded-lg">
+              <AlertCircle className="w-5 h-5 text-amber-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-white">{stats.pendingLogs}</p>
-              <p className="text-xs text-slate-400">Pending</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.pendingLogs}</p>
+              <p className="text-xs text-gray-500">Pending</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
+        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-purple-500/20 rounded-lg">
-              <CheckCircle className="w-5 h-5 text-purple-400" />
+            <div className="p-2 bg-purple-50 rounded-lg">
+              <CheckCircle className="w-5 h-5 text-purple-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-white">{stats.reviewedLogs}</p>
-              <p className="text-xs text-slate-400">Reviewed</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.reviewedLogs}</p>
+              <p className="text-xs text-gray-500">Reviewed</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
+        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-cyan-500/20 rounded-lg">
-              <Clock className="w-5 h-5 text-cyan-400" />
+            <div className="p-2 bg-cyan-50 rounded-lg">
+              <Clock className="w-5 h-5 text-cyan-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-white">{formatDuration(stats.totalDuration)}</p>
-              <p className="text-xs text-slate-400">Total Durasi</p>
+              <p className="text-2xl font-bold text-gray-900">{formatDuration(stats.totalDuration)}</p>
+              <p className="text-xs text-gray-500">Total Durasi</p>
             </div>
           </div>
         </div>
@@ -275,28 +275,29 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Activity Chart */}
-        <div className="lg:col-span-2 bg-slate-800/50 border border-slate-700 rounded-xl p-4">
-          <h2 className="text-lg font-semibold text-white mb-4">Aktivitas 14 Hari Terakhir</h2>
+        <div className="lg:col-span-2 bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Aktivitas 14 Hari Terakhir</h2>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={dailyActivity}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                <XAxis dataKey="date" stroke="#94a3b8" fontSize={12} />
-                <YAxis stroke="#94a3b8" fontSize={12} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis dataKey="date" stroke="#6b7280" fontSize={12} />
+                <YAxis stroke="#6b7280" fontSize={12} />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: '#1e293b',
-                    border: '1px solid #475569',
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #e5e7eb',
                     borderRadius: '8px',
+                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
                   }}
-                  labelStyle={{ color: '#f1f5f9' }}
+                  labelStyle={{ color: '#111827' }}
                 />
                 <Area
                   type="monotone"
                   dataKey="count"
-                  stroke="#3b82f6"
-                  fill="#3b82f6"
-                  fillOpacity={0.3}
+                  stroke="#dc2626"
+                  fill="#dc2626"
+                  fillOpacity={0.2}
                   name="Jumlah Log"
                 />
               </AreaChart>
@@ -305,8 +306,8 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
         </div>
 
         {/* Mood Distribution */}
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
-          <h2 className="text-lg font-semibold text-white mb-4">Distribusi Mood</h2>
+        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Distribusi Mood</h2>
           {pieData.length > 0 ? (
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
@@ -326,9 +327,10 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
                   </Pie>
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#1e293b',
-                      border: '1px solid #475569',
+                      backgroundColor: '#ffffff',
+                      border: '1px solid #e5e7eb',
                       borderRadius: '8px',
+                      boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
                     }}
                   />
                 </PieChart>
@@ -340,13 +342,13 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
                       className="w-3 h-3 rounded-full"
                       style={{ backgroundColor: item.color }}
                     />
-                    <span className="text-slate-400">{item.name}</span>
+                    <span className="text-gray-600">{item.name}</span>
                   </div>
                 ))}
               </div>
             </div>
           ) : (
-            <div className="h-64 flex items-center justify-center text-slate-500">
+            <div className="h-64 flex items-center justify-center text-gray-400">
               Belum ada data mood
             </div>
           )}
@@ -355,11 +357,11 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
 
       {/* Logs List */}
       <div>
-        <h2 className="text-lg font-semibold text-white mb-4">Riwayat Log</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Riwayat Log</h2>
         {logs.length === 0 ? (
-          <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-8 text-center">
-            <FileText className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-            <p className="text-slate-400">Belum ada log aktivitas</p>
+          <div className="bg-white border border-gray-200 rounded-xl p-8 text-center shadow-sm">
+            <FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+            <p className="text-gray-500">Belum ada log aktivitas</p>
           </div>
         ) : (
           <div className="space-y-3">

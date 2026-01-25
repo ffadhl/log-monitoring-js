@@ -16,6 +16,7 @@ model User {
   role      Role     @default(EMPLOYEE) 
   createdAt DateTime @default(now())
   logs      LogActivity[]
+  weeklyLogs WeeklyLog[]
 }
 
 model LogActivity {
@@ -28,6 +29,38 @@ model LogActivity {
   mood        String?
   userId      String
   user        User      @relation(fields: [userId], references: [id])
+  createdAt   DateTime  @default(now())
+}
+
+model WeeklyLog {
+  id          String    @id @default(uuid())
+  weekStart   DateTime  // Tanggal awal minggu (Senin)
+  weekEnd     DateTime  // Tanggal akhir minggu (Minggu)
+  weekNumber  Int       // Nomor minggu dalam tahun
+  year        Int       // Tahun
+  title       String
+  description String    @db.Text
+  summary     String?   @db.Text // Ringkasan mingguan
+  totalDuration Int     @default(0) // Total durasi dalam menit
+  status      LogStatus @default(SUBMITTED)
+  mood        String?
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  attachments WeeklyLogAttachment[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([userId, weekNumber, year])
+}
+
+model WeeklyLogAttachment {
+  id          String    @id @default(uuid())
+  fileName    String
+  fileUrl     String
+  fileType    String    // document, image, other
+  fileSize    Int       // dalam bytes
+  weeklyLogId String
+  weeklyLog   WeeklyLog @relation(fields: [weeklyLogId], references: [id], onDelete: Cascade)
   createdAt   DateTime  @default(now())
 }
 

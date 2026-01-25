@@ -20,10 +20,10 @@ export interface LogFormData {
 }
 
 const moodOptions = [
-  { value: 'produktif', label: '🔥 Produktif', color: 'bg-green-500/20 text-green-400' },
-  { value: 'biasa', label: '😊 Biasa', color: 'bg-blue-500/20 text-blue-400' },
-  { value: 'stuck', label: '😓 Stuck', color: 'bg-amber-500/20 text-amber-400' },
-  { value: 'overwhelmed', label: '😵 Overwhelmed', color: 'bg-red-500/20 text-red-400' },
+  { value: 'produktif', label: '🔥 Produktif', color: 'bg-green-50 text-green-700 border-green-200' },
+  { value: 'biasa', label: '😊 Biasa', color: 'bg-blue-50 text-blue-700 border-blue-200' },
+  { value: 'stuck', label: '😓 Stuck', color: 'bg-amber-50 text-amber-700 border-amber-200' },
+  { value: 'overwhelmed', label: '😵 Overwhelmed', color: 'bg-red-50 text-red-700 border-red-200' },
 ]
 
 export function LogForm({ onSubmit, onCancel, initialData, isEdit }: LogFormProps) {
@@ -47,33 +47,33 @@ export function LogForm({ onSubmit, onCancel, initialData, isEdit }: LogFormProp
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-slate-800 rounded-xl w-full max-w-lg border border-slate-700 shadow-2xl">
-        <div className="flex items-center justify-between p-4 border-b border-slate-700">
-          <h2 className="text-lg font-semibold text-white">
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl w-full max-w-lg border border-gray-200 shadow-2xl">
+        <div className="flex items-center justify-between p-4 border-b border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900">
             {isEdit ? 'Edit Log Aktivitas' : 'Tambah Log Aktivitas'}
           </h2>
-          <button onClick={onCancel} className="text-slate-400 hover:text-white">
+          <button onClick={onCancel} className="text-gray-400 hover:text-gray-600 transition">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-4 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Tanggal
             </label>
             <input
               type="date"
               value={formData.date}
               onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-              className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Judul Kegiatan
             </label>
             <input
@@ -81,13 +81,13 @@ export function LogForm({ onSubmit, onCancel, initialData, isEdit }: LogFormProp
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               placeholder="Contoh: Belajar deploy Docker"
-              className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Deskripsi Detail
             </label>
             <textarea
@@ -95,13 +95,13 @@ export function LogForm({ onSubmit, onCancel, initialData, isEdit }: LogFormProp
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Jelaskan apa yang kamu kerjakan, kendala yang dihadapi, dll..."
               rows={4}
-              className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Durasi (menit)
             </label>
             <input
@@ -109,13 +109,13 @@ export function LogForm({ onSubmit, onCancel, initialData, isEdit }: LogFormProp
               value={formData.duration}
               onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) || 0 })}
               min="1"
-              className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Mood Hari Ini
             </label>
             <div className="flex flex-wrap gap-2">
@@ -124,10 +124,10 @@ export function LogForm({ onSubmit, onCancel, initialData, isEdit }: LogFormProp
                   key={mood.value}
                   type="button"
                   onClick={() => setFormData({ ...formData, mood: mood.value })}
-                  className={`px-3 py-1.5 rounded-full text-sm transition ${
+                  className={`px-3 py-1.5 rounded-full text-sm border transition ${
                     formData.mood === mood.value
-                      ? mood.color + ' ring-2 ring-white/30'
-                      : 'bg-slate-700 text-slate-400 hover:bg-slate-600'
+                      ? mood.color + ' ring-2 ring-red-200'
+                      : 'bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100'
                   }`}
                 >
                   {mood.label}
@@ -141,14 +141,14 @@ export function LogForm({ onSubmit, onCancel, initialData, isEdit }: LogFormProp
               type="button"
               onClick={onCancel}
               variant="outline"
-              className="flex-1 border-slate-600 text-slate-300 hover:bg-slate-700"
+              className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-100"
             >
               Batal
             </Button>
             <Button
               type="submit"
               disabled={loading}
-              className="flex-1 bg-blue-600 hover:bg-blue-700"
+              className="flex-1 bg-red-600 hover:bg-red-700 text-white"
             >
               {loading ? 'Menyimpan...' : isEdit ? 'Update' : 'Simpan'}
             </Button>

@@ -115,7 +115,7 @@ export default function AdminDashboardPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-slate-400">Memuat data...</div>
+        <div className="text-gray-500">Memuat data...</div>
       </div>
     )
   }
@@ -125,15 +125,15 @@ export default function AdminDashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Admin Dashboard</h1>
-          <p className="text-slate-400 mt-1">
+          <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+          <p className="text-gray-500 mt-1">
             Pantau aktivitas seluruh karyawan
           </p>
         </div>
         <Button
           onClick={() => setShowFilters(!showFilters)}
           variant="outline"
-          className="border-slate-600 text-slate-300 hover:bg-slate-700"
+          className="border-gray-300 text-gray-700 hover:bg-gray-100"
         >
           <Filter className="w-4 h-4 mr-2" />
           Filter
@@ -142,16 +142,16 @@ export default function AdminDashboardPage() {
 
       {/* Filters */}
       {showFilters && (
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
+        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Karyawan
               </label>
               <select
                 value={selectedUser}
                 onChange={(e) => setSelectedUser(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
               >
                 <option value="">Semua Karyawan</option>
                 {employees.map((emp) => (
@@ -162,25 +162,25 @@ export default function AdminDashboardPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Dari Tanggal
               </label>
               <input
                 type="date"
                 value={dateRange.startDate}
                 onChange={(e) => setDateRange({ ...dateRange, startDate: e.target.value })}
-                className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Sampai Tanggal
               </label>
               <input
                 type="date"
                 value={dateRange.endDate}
                 onChange={(e) => setDateRange({ ...dateRange, endDate: e.target.value })}
-                className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
               />
             </div>
           </div>
@@ -189,62 +189,62 @@ export default function AdminDashboardPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
+        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-500/20 rounded-lg">
-              <Users className="w-5 h-5 text-blue-400" />
+            <div className="p-2 bg-blue-50 rounded-lg">
+              <Users className="w-5 h-5 text-blue-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-white">{stats.totalEmployees}</p>
-              <p className="text-xs text-slate-400">Karyawan</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.totalEmployees}</p>
+              <p className="text-xs text-gray-500">Karyawan</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
+        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-500/20 rounded-lg">
-              <FileText className="w-5 h-5 text-green-400" />
+            <div className="p-2 bg-green-50 rounded-lg">
+              <FileText className="w-5 h-5 text-green-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-white">{stats.totalLogs}</p>
-              <p className="text-xs text-slate-400">Total Log</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.totalLogs}</p>
+              <p className="text-xs text-gray-500">Total Log</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
+        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-purple-500/20 rounded-lg">
-              <TrendingUp className="w-5 h-5 text-purple-400" />
+            <div className="p-2 bg-purple-50 rounded-lg">
+              <TrendingUp className="w-5 h-5 text-purple-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-white">{stats.weeklyLogs}</p>
-              <p className="text-xs text-slate-400">Minggu Ini</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.weeklyLogs}</p>
+              <p className="text-xs text-gray-500">Minggu Ini</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
+        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-amber-500/20 rounded-lg">
-              <AlertCircle className="w-5 h-5 text-amber-400" />
+            <div className="p-2 bg-amber-50 rounded-lg">
+              <AlertCircle className="w-5 h-5 text-amber-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-white">{stats.pendingReview}</p>
-              <p className="text-xs text-slate-400">Pending Review</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.pendingReview}</p>
+              <p className="text-xs text-gray-500">Pending Review</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
+        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-cyan-500/20 rounded-lg">
-              <Clock className="w-5 h-5 text-cyan-400" />
+            <div className="p-2 bg-cyan-50 rounded-lg">
+              <Clock className="w-5 h-5 text-cyan-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-white">{formatDuration(stats.totalDuration)}</p>
-              <p className="text-xs text-slate-400">Total Durasi</p>
+              <p className="text-2xl font-bold text-gray-900">{formatDuration(stats.totalDuration)}</p>
+              <p className="text-xs text-gray-500">Total Durasi</p>
             </div>
           </div>
         </div>
@@ -253,89 +253,90 @@ export default function AdminDashboardPage() {
       {/* Charts & Leaderboard */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Activity Chart */}
-        <div className="lg:col-span-2 bg-slate-800/50 border border-slate-700 rounded-xl p-4">
+        <div className="lg:col-span-2 bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
           <div className="flex items-center gap-2 mb-4">
-            <Calendar className="w-5 h-5 text-blue-400" />
-            <h2 className="text-lg font-semibold text-white">Aktivitas 7 Hari Terakhir</h2>
+            <Calendar className="w-5 h-5 text-blue-600" />
+            <h2 className="text-lg font-semibold text-gray-900">Aktivitas 7 Hari Terakhir</h2>
           </div>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={dailyActivity}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                <XAxis dataKey="date" stroke="#94a3b8" fontSize={12} />
-                <YAxis stroke="#94a3b8" fontSize={12} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis dataKey="date" stroke="#6b7280" fontSize={12} />
+                <YAxis stroke="#6b7280" fontSize={12} />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: '#1e293b',
-                    border: '1px solid #475569',
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #e5e7eb',
                     borderRadius: '8px',
+                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
                   }}
-                  labelStyle={{ color: '#f1f5f9' }}
+                  labelStyle={{ color: '#111827' }}
                 />
-                <Bar dataKey="count" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="count" fill="#dc2626" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         {/* Leaderboard */}
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
+        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
           <div className="flex items-center gap-2 mb-4">
-            <Trophy className="w-5 h-5 text-amber-400" />
-            <h2 className="text-lg font-semibold text-white">Leaderboard Minggu Ini</h2>
+            <Trophy className="w-5 h-5 text-amber-500" />
+            <h2 className="text-lg font-semibold text-gray-900">Leaderboard Minggu Ini</h2>
           </div>
           <div className="space-y-3">
             {leaderboard.slice(0, 5).map((user, index) => (
               <div
                 key={user.id}
-                className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-700/50 transition"
+                className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition"
               >
                 <span className={`w-6 h-6 flex items-center justify-center rounded-full text-sm font-bold ${
                   index === 0 ? 'bg-amber-500 text-white' :
-                  index === 1 ? 'bg-slate-400 text-white' :
+                  index === 1 ? 'bg-gray-400 text-white' :
                   index === 2 ? 'bg-amber-700 text-white' :
-                  'bg-slate-600 text-slate-300'
+                  'bg-gray-200 text-gray-600'
                 }`}>
                   {index + 1}
                 </span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-white truncate">{user.name}</p>
-                  <p className="text-xs text-slate-400">{user.logCount} log · {formatDuration(user.totalDuration)}</p>
+                  <p className="text-sm font-medium text-gray-900 truncate">{user.name}</p>
+                  <p className="text-xs text-gray-500">{user.logCount} log · {formatDuration(user.totalDuration)}</p>
                 </div>
                 <Link href={`/admin/users/${user.id}`}>
-                  <Button variant="ghost" size="sm" className="text-slate-400 hover:text-white">
+                  <Button variant="ghost" size="sm" className="text-gray-400 hover:text-red-600">
                     <Eye className="w-4 h-4" />
                   </Button>
                 </Link>
               </div>
             ))}
             {leaderboard.length === 0 && (
-              <p className="text-sm text-slate-500 text-center py-4">Belum ada data</p>
+              <p className="text-sm text-gray-500 text-center py-4">Belum ada data</p>
             )}
           </div>
         </div>
       </div>
 
       {/* Employee List */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
+      <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
         <div className="flex items-center gap-2 mb-4">
-          <Users className="w-5 h-5 text-blue-400" />
-          <h2 className="text-lg font-semibold text-white">Daftar Karyawan</h2>
+          <Users className="w-5 h-5 text-blue-600" />
+          <h2 className="text-lg font-semibold text-gray-900">Daftar Karyawan</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {employees.map((emp) => (
             <Link
               key={emp.id}
               href={`/admin/users/${emp.id}`}
-              className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg hover:bg-slate-700/50 transition"
+              className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition border border-gray-100"
             >
               <div>
-                <p className="text-sm font-medium text-white">{emp.name}</p>
-                <p className="text-xs text-slate-400">{emp.email}</p>
+                <p className="text-sm font-medium text-gray-900">{emp.name}</p>
+                <p className="text-xs text-gray-500">{emp.email}</p>
               </div>
               <div className="text-right">
-                <p className="text-lg font-bold text-blue-400">{emp._count.logs}</p>
-                <p className="text-xs text-slate-500">log</p>
+                <p className="text-lg font-bold text-red-600">{emp._count.logs}</p>
+                <p className="text-xs text-gray-400">log</p>
               </div>
             </Link>
           ))}
@@ -345,13 +346,13 @@ export default function AdminDashboardPage() {
       {/* Recent Logs */}
       <div>
         <div className="flex items-center gap-2 mb-4">
-          <FileText className="w-5 h-5 text-green-400" />
-          <h2 className="text-lg font-semibold text-white">Log Terbaru</h2>
+          <FileText className="w-5 h-5 text-green-600" />
+          <h2 className="text-lg font-semibold text-gray-900">Log Terbaru</h2>
         </div>
         {logs.length === 0 ? (
-          <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-8 text-center">
-            <FileText className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-            <p className="text-slate-400">Belum ada log aktivitas</p>
+          <div className="bg-white border border-gray-200 rounded-xl p-8 text-center shadow-sm">
+            <FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+            <p className="text-gray-500">Belum ada log aktivitas</p>
           </div>
         ) : (
           <div className="space-y-3">

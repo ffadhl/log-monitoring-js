@@ -42,16 +42,17 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white">
-      <div className="w-full max-w-md p-10">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-white">
+      <div className="w-full max-w-md p-10 bg-white rounded-2xl shadow-xl border border-gray-100">
         {/* Logo */}
         <div className="flex justify-center mb-8">
           <Image
             src={logoImg}
             alt="PT Lotte Chemical Indonesia"
-            width={140}
-            height={140}
-            className="object-contain"
+            width={120}
+            height={120}
+            className="object-contain drop-shadow-sm"
+            priority
           />
         </div>
 

@@ -1,0 +1,5 @@
+# Uploads Directory
+
+This directory is for storing uploaded files from weekly logs.
+
+Files are organized as: `/uploads/weekly-logs/{weeklyLogId}/{filename}`
