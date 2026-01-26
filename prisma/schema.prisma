@@ -1,7 +1,9 @@
 // prisma/schema.prisma
+// CareerTrack - Mentoring & Activity Log System
 
 generator client {
   provider = "prisma-client-js"
+  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -10,67 +12,99 @@ datasource db {
 
 model User {
   id        String   @id @default(uuid())
-  name      String
   email     String   @unique
+  name      String
   password  String
-  role      Role     @default(EMPLOYEE) 
+  role      Role     @default(EMPLOYEE)
+  
+  // Self-relation for Manager-Subordinate
+  managerId String?
+  manager   User?    @relation("ManagerSubordinate", fields: [managerId], references: [id])
+  subordinates User[] @relation("ManagerSubordinate")
+
+  dailyLogs     DailyLog[]
+  weeklyReports WeeklyReport[]
+  careerGoals   CareerGoal[]
+  
   createdAt DateTime @default(now())
-  logs      LogActivity[]
-  weeklyLogs WeeklyLog[]
 }
 
-model LogActivity {
-  id          String    @id @default(uuid())
-  title       String
-  description String
-  date        DateTime  @default(now())
-  duration    Int
-  status      LogStatus @default(SUBMITTED)
-  mood        String?
-  userId      String
-  user        User      @relation(fields: [userId], references: [id])
-  createdAt   DateTime  @default(now())
+model DailyLog {
+  id        String   @id @default(uuid())
+  date      DateTime @default(now())
+  content   String   @db.Text 
+  mood      String?  // Can be emoji or scale
+  
+  weeklyReportId String?
+  weeklyReport   WeeklyReport? @relation(fields: [weeklyReportId], references: [id])
+  
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-model WeeklyLog {
-  id          String    @id @default(uuid())
-  weekStart   DateTime  // Tanggal awal minggu (Senin)
-  weekEnd     DateTime  // Tanggal akhir minggu (Minggu)
-  weekNumber  Int       // Nomor minggu dalam tahun
-  year        Int       // Tahun
-  title       String
-  description String    @db.Text
-  summary     String?   @db.Text // Ringkasan mingguan
-  totalDuration Int     @default(0) // Total durasi dalam menit
-  status      LogStatus @default(SUBMITTED)
-  mood        String?
-  userId      String
-  user        User      @relation(fields: [userId], references: [id])
-  attachments WeeklyLogAttachment[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
+model WeeklyReport {
+  id              String   @id @default(uuid())
+  startDate       DateTime
+  endDate         DateTime
+  weekNumber      Int
+  year            Int
+  summary         String?  @db.Text 
+  managerFeedback String?  @db.Text
+  status          ReportStatus @default(DRAFT)
+  
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  
+  dailyLogs   DailyLog[] 
+  attachments Attachment[] 
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
   @@unique([userId, weekNumber, year])
 }
 
-model WeeklyLogAttachment {
-  id          String    @id @default(uuid())
-  fileName    String
-  fileUrl     String
-  fileType    String    // document, image, other
-  fileSize    Int       // dalam bytes
-  weeklyLogId String
-  weeklyLog   WeeklyLog @relation(fields: [weeklyLogId], references: [id], onDelete: Cascade)
-  createdAt   DateTime  @default(now())
+model Attachment {
+  id             String   @id @default(uuid())
+  fileName       String
+  fileUrl        String
+  weeklyReportId String
+  weeklyReport   WeeklyReport @relation(fields: [weeklyReportId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+}
+
+model CareerGoal {
+  id             String    @id @default(uuid())
+  title          String
+  description    String    @db.Text
+  targetDate     DateTime?
+  status         GoalStatus @default(IN_PROGRESS)
+  managerComment String?   @db.Text
+  userId         String
+  user           User      @relation(fields: [userId], references: [id])
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 }
 
 enum Role {
   ADMIN
+  MANAGER
   EMPLOYEE
 }
 
-enum LogStatus {
+enum ReportStatus {
   DRAFT
   SUBMITTED
   REVIEWED
+}
+
+enum GoalStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  ON_HOLD
 }

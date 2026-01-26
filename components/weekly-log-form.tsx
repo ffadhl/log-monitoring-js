@@ -319,7 +319,7 @@ export function WeeklyLogForm({ onSubmit, onCancel, initialData, isEdit, logId }
                     >
                       <div className="flex items-center gap-2">
                         <FileIcon className="w-4 h-4 text-gray-500" />
-                        <span className="text-sm text-gray-700 truncate max-w-[200px]">
+                        <span className="text-sm text-gray-700 truncate max-w-50">
                           {attachment.fileName}
                         </span>
                         <span className="text-xs text-gray-400">

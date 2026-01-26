@@ -134,7 +134,7 @@ export function WeeklyLogCard({ log, onEdit, onDelete, onReview, showUser, isAdm
                       className="flex items-center gap-1.5 px-2 py-1 bg-gray-100 rounded-md text-xs text-gray-600 hover:bg-gray-200 transition"
                     >
                       <FileIcon className="w-3 h-3" />
-                      <span className="truncate max-w-[100px]">{attachment.fileName}</span>
+                      <span className="truncate max-w-25">{attachment.fileName}</span>
                       <span className="text-gray-400">({formatFileSize(attachment.fileSize)})</span>
                     </a>
                   )

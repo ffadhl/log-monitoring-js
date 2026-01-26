@@ -9,7 +9,8 @@ export interface UserPayload {
   id: string
   email: string
   name: string
-  role: 'ADMIN' | 'EMPLOYEE'
+  role: 'ADMIN' | 'MANAGER' | 'EMPLOYEE'
+  managerId?: string | null
 }
 
 export async function hashPassword(password: string): Promise<string> {
@@ -58,4 +59,14 @@ export async function setSession(user: UserPayload): Promise<void> {
 export async function clearSession(): Promise<void> {
   const cookieStore = await cookies()
   cookieStore.delete('auth-token')
+}
+
+// Helper to check if user is a manager
+export function isManager(role: string): boolean {
+  return role === 'MANAGER' || role === 'ADMIN'
+}
+
+// Helper to check if user is admin
+export function isAdmin(role: string): boolean {
+  return role === 'ADMIN'
 }

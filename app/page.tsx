@@ -5,8 +5,8 @@ export default async function HomePage() {
   const session = await getSession()
 
   if (session) {
-    redirect(session.role === 'ADMIN' ? '/admin' : '/dashboard')
+    redirect('/app/dashboard')
   }
 
-  redirect('/login')
+  redirect('/auth/login')
 }

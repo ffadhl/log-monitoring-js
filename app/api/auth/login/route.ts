@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
 
     if (!email || !password) {
       return NextResponse.json(
-        { error: 'Email dan password harus diisi' },
+        { error: 'Email and password are required' },
         { status: 400 }
       )
     }
@@ -19,18 +19,17 @@ export async function POST(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json(
-        { error: 'Email atau password salah' },
+        { error: 'Invalid email or password' },
         { status: 401 }
       )
     }
 
-    // Untuk sementara, compare plain password (nanti ganti dengan hashed)
-    // const isValid = await verifyPassword(password, user.password)
-    const isValid = password === user.password // Simple check for now
+    // For development, allow plain password check
+    const isValid = await verifyPassword(password, user.password).catch(() => password === user.password)
 
     if (!isValid) {
       return NextResponse.json(
-        { error: 'Email atau password salah' },
+        { error: 'Invalid email or password' },
         { status: 401 }
       )
     }
@@ -39,7 +38,8 @@ export async function POST(request: NextRequest) {
       id: user.id,
       email: user.email,
       name: user.name,
-      role: user.role as 'ADMIN' | 'EMPLOYEE',
+      role: user.role as 'ADMIN' | 'MANAGER' | 'EMPLOYEE',
+      managerId: user.managerId,
     })
 
     return NextResponse.json({
@@ -50,12 +50,12 @@ export async function POST(request: NextRequest) {
         name: user.name,
         role: user.role,
       },
-      redirectUrl: user.role === 'ADMIN' ? '/admin' : '/dashboard',
+      redirectUrl: '/app/dashboard',
     })
   } catch (error) {
     console.error('Login error:', error)
     return NextResponse.json(
-      { error: 'Terjadi kesalahan server' },
+      { error: 'Server error occurred' },
       { status: 500 }
     )
   }

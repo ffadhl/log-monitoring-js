@@ -1,118 +1,208 @@
+// app/api/admin/users/[id]/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getSession } from '@/lib/auth'
-import { startOfWeek, endOfWeek, subDays, format } from 'date-fns'
+import bcrypt from 'bcryptjs'
 
+// GET - Get single user
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await getSession()
-  if (!session || session.role !== 'ADMIN') {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  const { id } = await params
-  const searchParams = request.nextUrl.searchParams
-  const startDate = searchParams.get('startDate')
-  const endDate = searchParams.get('endDate')
-
-  // Get user info
-  const user = await prisma.user.findUnique({
-    where: { id },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      role: true,
-      createdAt: true,
-    },
-  })
-
-  if (!user) {
-    return NextResponse.json({ error: 'User tidak ditemukan' }, { status: 404 })
-  }
-
-  // Build where clause for logs
-  const where: Record<string, unknown> = { userId: id }
-  if (startDate && endDate) {
-    where.date = {
-      gte: new Date(startDate),
-      lte: new Date(endDate),
+  try {
+    const currentUser = await getSession()
+    if (!currentUser || currentUser.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-  }
 
-  // Get user's logs
-  const logs = await prisma.logActivity.findMany({
-    where,
-    orderBy: { date: 'desc' },
-  })
+    const { id } = await params
 
-  // Calculate stats
-  const now = new Date()
-  const weekStart = startOfWeek(now, { weekStartsOn: 1 })
-  const weekEnd = endOfWeek(now, { weekStartsOn: 1 })
-
-  const weeklyLogs = await prisma.logActivity.count({
-    where: {
-      userId: id,
-      date: { gte: weekStart, lte: weekEnd },
-    },
-  })
-
-  const reviewedLogs = await prisma.logActivity.count({
-    where: { userId: id, status: 'REVIEWED' },
-  })
-
-  const pendingLogs = await prisma.logActivity.count({
-    where: { userId: id, status: 'SUBMITTED' },
-  })
-
-  const totalDuration = await prisma.logActivity.aggregate({
-    where: { userId: id },
-    _sum: { duration: true },
-  })
-
-  // Daily activity for chart (last 14 days)
-  const dailyActivity = []
-  for (let i = 13; i >= 0; i--) {
-    const date = subDays(now, i)
-    const dayStart = new Date(date.setHours(0, 0, 0, 0))
-    const dayEnd = new Date(date.setHours(23, 59, 59, 999))
-
-    const dayLogs = await prisma.logActivity.findMany({
-      where: {
-        userId: id,
-        date: { gte: dayStart, lte: dayEnd },
+    const user = await prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        managerId: true,
+        manager: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        subordinates: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+          },
+        },
+        _count: {
+          select: {
+            subordinates: true,
+            dailyLogs: true,
+            weeklyReports: true,
+            careerGoals: true,
+          },
+        },
+        createdAt: true,
       },
-      select: { duration: true },
     })
 
-    dailyActivity.push({
-      date: format(dayStart, 'dd/MM'),
-      count: dayLogs.length,
-      duration: dayLogs.reduce((acc, log) => acc + log.duration, 0),
-    })
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    }
+
+    return NextResponse.json(user)
+  } catch (error) {
+    console.error('Failed to fetch user:', error)
+    return NextResponse.json({ error: 'Failed to fetch user' }, { status: 500 })
   }
+}
 
-  // Mood distribution
-  const moodCounts = await prisma.logActivity.groupBy({
-    by: ['mood'],
-    where: { userId: id, mood: { not: null } },
-    _count: true,
-  })
+// PUT - Update user
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const currentUser = await getSession()
+    if (!currentUser || currentUser.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
 
-  return NextResponse.json({
-    user,
-    logs,
-    stats: {
-      totalLogs: logs.length,
-      weeklyLogs,
-      reviewedLogs,
-      pendingLogs,
-      totalDuration: totalDuration._sum.duration || 0,
-    },
-    dailyActivity,
-    moodDistribution: moodCounts,
-  })
+    const { id } = await params
+    const body = await request.json()
+    const { email, name, password, role, managerId } = body
+
+    // Check if user exists
+    const existingUser = await prisma.user.findUnique({
+      where: { id },
+    })
+
+    if (!existingUser) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    }
+
+    // Check if email is being changed and if it's already taken
+    if (email && email !== existingUser.email) {
+      const emailTaken = await prisma.user.findUnique({
+        where: { email },
+      })
+      if (emailTaken) {
+        return NextResponse.json(
+          { error: 'Email already exists' },
+          { status: 400 }
+        )
+      }
+    }
+
+    // Prevent self-assignment as manager (circular reference)
+    if (managerId === id) {
+      return NextResponse.json(
+        { error: 'User cannot be their own manager' },
+        { status: 400 }
+      )
+    }
+
+    // Build update data
+    const updateData: Record<string, unknown> = {}
+    if (email) updateData.email = email
+    if (name) updateData.name = name
+    if (role) updateData.role = role
+    if (managerId !== undefined) updateData.managerId = managerId || null
+    if (password) {
+      updateData.password = await bcrypt.hash(password, 10)
+    }
+
+    const user = await prisma.user.update({
+      where: { id },
+      data: updateData,
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        managerId: true,
+        manager: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        createdAt: true,
+      },
+    })
+
+    return NextResponse.json(user)
+  } catch (error) {
+    console.error('Failed to update user:', error)
+    return NextResponse.json({ error: 'Failed to update user' }, { status: 500 })
+  }
+}
+
+// DELETE - Delete user
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const currentUser = await getSession()
+    if (!currentUser || currentUser.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const { id } = await params
+
+    // Prevent deleting self
+    if (id === currentUser.id) {
+      return NextResponse.json(
+        { error: 'Cannot delete your own account' },
+        { status: 400 }
+      )
+    }
+
+    // Check if user exists
+    const existingUser = await prisma.user.findUnique({
+      where: { id },
+      include: {
+        _count: {
+          select: {
+            subordinates: true,
+          },
+        },
+      },
+    })
+
+    if (!existingUser) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    }
+
+    // If user has subordinates, unassign them first
+    if (existingUser._count.subordinates > 0) {
+      await prisma.user.updateMany({
+        where: { managerId: id },
+        data: { managerId: null },
+      })
+    }
+
+    // Delete related data first (cascade)
+    await prisma.dailyLog.deleteMany({ where: { userId: id } })
+    await prisma.weeklyReport.deleteMany({ where: { userId: id } })
+    await prisma.careerGoal.deleteMany({ where: { userId: id } })
+
+    // Delete user
+    await prisma.user.delete({
+      where: { id },
+    })
+
+    return NextResponse.json({ message: 'User deleted successfully' })
+  } catch (error) {
+    console.error('Failed to delete user:', error)
+    return NextResponse.json({ error: 'Failed to delete user' }, { status: 500 })
+  }
 }
