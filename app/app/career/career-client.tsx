@@ -7,7 +7,6 @@ import {
   Plus,
   Edit,
   Trash2,
-  Calendar,
   MessageSquare,
   CheckCircle2,
   Circle,
@@ -40,11 +39,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Calendar as CalendarComponent } from '@/components/ui/calendar'
-import { formatDate } from '@/lib/date-utils'
 import { GOAL_STATUS_CONFIG, type CareerGoal, type GoalStatus } from '@/lib/types'
-import { format } from 'date-fns'
 
 interface CareerClientProps {
   goals: CareerGoal[]
@@ -215,26 +210,22 @@ export function CareerClient({ goals: initialGoals }: CareerClientProps) {
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>Target Date (Optional)</Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="w-full justify-start text-left font-normal"
-                      >
-                        <Calendar className="mr-2 size-4" />
-                        {targetDate ? format(targetDate, 'PPP') : 'Pick a date'}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                      <CalendarComponent
-                        mode="single"
-                        selected={targetDate}
-                        onSelect={setTargetDate}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
+                  <Label>Target Year (Optional)</Label>
+                  <Select 
+                    value={targetDate ? String(targetDate.getFullYear()) : ''} 
+                    onValueChange={(v) => setTargetDate(v ? new Date(parseInt(v), 0, 1) : undefined)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select year" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() + i).map((year) => (
+                        <SelectItem key={year} value={String(year)}>
+                          {year}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-2">
                   <Label>Status</Label>
@@ -397,7 +388,7 @@ export function CareerClient({ goals: initialGoals }: CareerClientProps) {
                   {goal.targetDate && (
                     <div className="flex items-center gap-2 text-sm">
                       <Flag className="size-4 text-muted-foreground" />
-                      <span>Target: {formatDate(goal.targetDate)}</span>
+                      <span>Target: {new Date(goal.targetDate).getFullYear()}</span>
                     </div>
                   )}
                   {goal.managerComment && (
@@ -492,26 +483,22 @@ export function CareerClient({ goals: initialGoals }: CareerClientProps) {
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label>Target Date (Optional)</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start text-left font-normal"
-                    >
-                      <Calendar className="mr-2 size-4" />
-                      {targetDate ? format(targetDate, 'PPP') : 'Pick a date'}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <CalendarComponent
-                      mode="single"
-                      selected={targetDate}
-                      onSelect={setTargetDate}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+                <Label>Target Year (Optional)</Label>
+                <Select 
+                  value={targetDate ? String(targetDate.getFullYear()) : ''} 
+                  onValueChange={(v) => setTargetDate(v ? new Date(parseInt(v), 0, 1) : undefined)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select year" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() + i).map((year) => (
+                      <SelectItem key={year} value={String(year)}>
+                        {year}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label>Status</Label>

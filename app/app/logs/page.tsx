@@ -7,6 +7,9 @@ import {
   getWeekInfo,
   getDaysInWeek,
   formatForApi,
+  getWeekStart,
+  getWeekEnd,
+  getWeekNumber,
 } from '@/lib/date-utils'
 
 interface LogsPageProps {
@@ -14,6 +17,36 @@ interface LogsPageProps {
     week?: string
     year?: string
   }>
+}
+
+// Generate available weeks from join date to current week (server-side)
+function generateAvailableWeeks() {
+  const weeks: { weekNumber: number; year: number; startDate: string; endDate: string; isCurrent: boolean }[] = []
+  const joinDate = new Date(2025, 10, 3) // Nov 3, 2025
+  const today = new Date()
+  
+  let currentDate = getWeekStart(joinDate)
+  const todayWeekStart = getWeekStart(today)
+  
+  while (currentDate <= todayWeekStart) {
+    const weekStart = new Date(currentDate)
+    const weekEnd = getWeekEnd(weekStart)
+    const weekNum = getWeekNumber(currentDate)
+    const year = currentDate.getFullYear()
+    
+    weeks.push({
+      weekNumber: weekNum,
+      year: year,
+      startDate: weekStart.toISOString(),
+      endDate: weekEnd.toISOString(),
+      isCurrent: currentDate.getTime() === todayWeekStart.getTime(),
+    })
+    
+    currentDate.setDate(currentDate.getDate() + 7)
+  }
+  
+  // Reverse to show most recent first
+  return weeks.reverse()
 }
 
 export default async function LogsPage({ searchParams }: LogsPageProps) {
@@ -81,6 +114,9 @@ export default async function LogsPage({ searchParams }: LogsPageProps) {
   // Get days in week for display
   const daysInWeek = getDaysInWeek(startDate).map((d) => formatForApi(d))
 
+  // Generate available weeks for selector (server-side to avoid hydration mismatch)
+  const availableWeeks = generateAvailableWeeks()
+
   return (
     <LogsClient
       weekInfo={{
@@ -92,6 +128,7 @@ export default async function LogsPage({ searchParams }: LogsPageProps) {
       weeklyReport={weeklyReport}
       dailyLogs={dailyLogs}
       daysInWeek={daysInWeek}
+      availableWeeks={availableWeeks}
     />
   )
 }

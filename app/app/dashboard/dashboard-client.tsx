@@ -127,63 +127,74 @@ export function DashboardClient({
 
       {/* Main Content Grid */}
       <div className="grid gap-6 lg:grid-cols-7">
-        {/* Weekly Activity Chart */}
+        {/* Weekly Progress */}
         <Card className="lg:col-span-4">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="size-5 text-muted-foreground" />
-              Weekly Activity
+              Weekly Progress
             </CardTitle>
             <CardDescription>
-              Your logging activity for the current week
+              Your logging progress this week
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="h-[300px] min-h-[300px] w-full">
-              {weeklyActivity && weeklyActivity.length > 0 ? (
-                <ResponsiveContainer width="100%" height={300}>
-                  <AreaChart data={weeklyActivity}>
-                  <defs>
-                    <linearGradient id="colorLogs" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                  <XAxis
-                    dataKey="day"
-                    tick={{ fontSize: 12 }}
-                    tickLine={false}
-                    axisLine={false}
-                    className="text-muted-foreground"
-                  />
-                  <YAxis
-                    tick={{ fontSize: 12 }}
-                    tickLine={false}
-                    axisLine={false}
-                    className="text-muted-foreground"
-                    allowDecimals={false}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: 'hsl(var(--card))',
-                      border: '1px solid hsl(var(--border))',
-                      borderRadius: '8px',
-                      fontSize: '12px',
-                    }}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="logs"
-                    stroke="hsl(var(--primary))"
-                    fill="url(#colorLogs)"
-                    strokeWidth={2}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-              ) : (
-                <div className="flex items-center justify-center h-full text-muted-foreground">
-                  No activity data
+            <div className="space-y-6">
+              {/* Progress Bar */}
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Days Logged</span>
+                  <span className="font-medium">{stats.logsThisWeek} / 7 days</span>
+                </div>
+                <Progress value={(stats.logsThisWeek / 7) * 100} className="h-3" />
+              </div>
+              
+              {/* Stats Summary */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 rounded-lg bg-muted/50">
+                  <p className="text-2xl font-bold">{stats.logsThisWeek}</p>
+                  <p className="text-sm text-muted-foreground">Logs this week</p>
+                </div>
+                <div className="p-4 rounded-lg bg-muted/50">
+                  <p className="text-2xl font-bold">{7 - stats.logsThisWeek}</p>
+                  <p className="text-sm text-muted-foreground">Days remaining</p>
+                </div>
+              </div>
+
+              {/* Weekly Activity Mini Chart */}
+              {weeklyActivity && weeklyActivity.length > 0 && (
+                <div className="h-[150px] w-full">
+                  <ResponsiveContainer width="100%" height={150}>
+                    <AreaChart data={weeklyActivity}>
+                      <defs>
+                        <linearGradient id="colorLogs" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                          <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                      <XAxis
+                        dataKey="day"
+                        tick={{ fontSize: 10 }}
+                        tickLine={false}
+                        axisLine={false}
+                      />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: 'hsl(var(--card))',
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '8px',
+                          fontSize: '12px',
+                        }}
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="logs"
+                        stroke="hsl(var(--primary))"
+                        fill="url(#colorLogs)"
+                        strokeWidth={2}
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
                 </div>
               )}
             </div>
@@ -358,7 +369,7 @@ export function DashboardClient({
                       </p>
                       {goal.targetDate && (
                         <p className="text-xs text-muted-foreground mt-1">
-                          Target: {formatDate(goal.targetDate)}
+                          Target: {new Date(goal.targetDate).getFullYear()}
                         </p>
                       )}
                     </div>

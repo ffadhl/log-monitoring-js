@@ -63,7 +63,7 @@ export default function LoginPage() {
           </div>
           
           <div className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-primary">CareerTrack</CardTitle>
+            <CardTitle className="text-2xl font-bold text-primary">Reyhan Personal Career Track</CardTitle>
             <CardDescription className="text-base">
               Mentoring & Activity Log System
             </CardDescription>

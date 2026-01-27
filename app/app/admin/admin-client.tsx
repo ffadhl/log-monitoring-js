@@ -720,21 +720,23 @@ export function AdminClient({ initialUsers, managers }: AdminClientProps) {
               <AlertTriangle className="size-5 text-destructive" />
               Delete User
             </AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete <strong>{selectedUser?.name}</strong>?
-              This action cannot be undone.
-              <br /><br />
-              This will also delete all their:
-              <ul className="list-disc list-inside mt-2 text-sm">
-                <li>Daily logs ({selectedUser?._count.dailyLogs || 0})</li>
-                <li>Weekly reports ({selectedUser?._count.weeklyReports || 0})</li>
-                <li>Career goals ({selectedUser?._count.careerGoals || 0})</li>
-              </ul>
-              {selectedUser?._count.subordinates ? (
-                <p className="mt-2 text-amber-600">
-                  ⚠️ This user has {selectedUser._count.subordinates} team members who will be unassigned.
-                </p>
-              ) : null}
+            <AlertDialogDescription asChild>
+              <div className="text-muted-foreground text-sm">
+                Are you sure you want to delete <strong>{selectedUser?.name}</strong>?
+                This action cannot be undone.
+                <br /><br />
+                This will also delete all their:
+                <ul className="list-disc list-inside mt-2 text-sm">
+                  <li>Daily logs ({selectedUser?._count.dailyLogs || 0})</li>
+                  <li>Weekly reports ({selectedUser?._count.weeklyReports || 0})</li>
+                  <li>Career goals ({selectedUser?._count.careerGoals || 0})</li>
+                </ul>
+                {selectedUser?._count.subordinates ? (
+                  <p className="mt-2 text-amber-600">
+                    ⚠️ This user has {selectedUser._count.subordinates} team members who will be unassigned.
+                  </p>
+                ) : null}
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

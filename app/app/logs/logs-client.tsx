@@ -3,8 +3,6 @@
 import * as React from 'react'
 import { useState } from 'react'
 import {
-  ChevronLeft,
-  ChevronRight,
   Plus,
   Calendar,
   FileText,
@@ -45,6 +43,14 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { formatDate, formatDateRange, getDayName, isSameDayCheck } from '@/lib/date-utils'
 import { MOOD_OPTIONS, REPORT_STATUS_CONFIG, type DailyLog, type WeeklyReport } from '@/lib/types'
 
+interface WeekOption {
+  weekNumber: number
+  year: number
+  startDate: string
+  endDate: string
+  isCurrent: boolean
+}
+
 interface LogsClientProps {
   weekInfo: {
     weekNumber: number
@@ -55,6 +61,7 @@ interface LogsClientProps {
   weeklyReport: WeeklyReport | null
   dailyLogs: DailyLog[]
   daysInWeek: string[]
+  availableWeeks: WeekOption[]
 }
 
 export function LogsClient({
@@ -62,6 +69,7 @@ export function LogsClient({
   weeklyReport,
   dailyLogs,
   daysInWeek,
+  availableWeeks,
 }: LogsClientProps) {
   const [isAddingLog, setIsAddingLog] = useState(false)
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
@@ -77,20 +85,6 @@ export function LogsClient({
 
   const getLogsForDay = (dayStr: string) => {
     return currentLogs.filter((log) => isSameDayCheck(log.date, dayStr))
-  }
-
-  const handleNavigateWeek = async (direction: 'prev' | 'next') => {
-    const newWeekNumber = direction === 'next' 
-      ? currentWeekInfo.weekNumber + 1 
-      : currentWeekInfo.weekNumber - 1
-    
-    // Simple navigation - in real app, would handle year boundaries
-    const params = new URLSearchParams({
-      week: String(newWeekNumber),
-      year: String(currentWeekInfo.year),
-    })
-    
-    window.location.href = `/app/logs?${params.toString()}`
   }
 
   const handleAddLog = async () => {
@@ -234,33 +228,43 @@ export function LogsClient({
         </div>
       </div>
 
-      {/* Week Navigation */}
+      {/* Week Selector */}
       <Card>
-        <CardContent className="py-4">
-          <div className="flex items-center justify-between">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => handleNavigateWeek('prev')}
-            >
-              <ChevronLeft className="size-5" />
-            </Button>
-            <div className="text-center">
-              <h2 className="text-lg font-semibold">
-                Week {currentWeekInfo.weekNumber}, {currentWeekInfo.year}
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                {formatDateRange(currentWeekInfo.startDate, currentWeekInfo.endDate)}
-              </p>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Select Week</CardTitle>
+          <CardDescription>
+            Choose a week to view your logs
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ScrollArea className="h-[200px] pr-4">
+            <div className="space-y-2">
+              {availableWeeks.map((week) => (
+                <Button
+                  key={`${week.year}-${week.weekNumber}`}
+                  variant={currentWeekInfo.weekNumber === week.weekNumber && currentWeekInfo.year === week.year ? 'default' : 'outline'}
+                  className="w-full justify-start h-auto py-3"
+                  onClick={() => {
+                    const params = new URLSearchParams({
+                      week: String(week.weekNumber),
+                      year: String(week.year),
+                    })
+                    window.location.href = `/app/logs?${params.toString()}`
+                  }}
+                >
+                  <div className="flex flex-col items-start">
+                    <span className="font-medium">
+                      Week {week.weekNumber}, {week.year}
+                      {week.isCurrent && <span className="ml-2 text-xs bg-primary/20 px-2 py-0.5 rounded">Current</span>}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {formatDateRange(week.startDate, week.endDate)}
+                    </span>
+                  </div>
+                </Button>
+              ))}
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => handleNavigateWeek('next')}
-            >
-              <ChevronRight className="size-5" />
-            </Button>
-          </div>
+          </ScrollArea>
         </CardContent>
       </Card>
 
