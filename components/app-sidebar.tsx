@@ -13,6 +13,12 @@ import {
   Settings,
   ChevronRight,
   ShieldCheck,
+  Activity,
+  BarChart3,
+  UserCog,
+  Database,
+  FileSearch,
+  Cog,
 } from 'lucide-react'
 
 import {
@@ -51,42 +57,75 @@ interface AppSidebarProps {
   children: React.ReactNode
 }
 
-const mainNavItems = [
+// Employee menu items
+const employeeNavItems = [
   {
     title: 'Dashboard',
     url: '/app/dashboard',
     icon: LayoutDashboard,
-    roles: ['ADMIN', 'MANAGER', 'EMPLOYEE'],
   },
   {
     title: 'My Logs',
     url: '/app/logs',
     icon: BookOpen,
-    roles: ['ADMIN', 'MANAGER', 'EMPLOYEE'],
   },
   {
     title: 'Career Path',
     url: '/app/career',
     icon: Target,
-    roles: ['ADMIN', 'MANAGER', 'EMPLOYEE'],
   },
 ]
 
+// Manager menu items  
 const managerNavItems = [
   {
-    title: 'Team Review',
+    title: 'Dashboard',
+    url: '/app/dashboard',
+    icon: LayoutDashboard,
+  },
+  {
+    title: 'Team Activity',
     url: '/app/team-review',
+    icon: Activity,
+  },
+  {
+    title: 'Team Performance',
+    url: '/app/team-performance',
+    icon: BarChart3,
+  },
+  {
+    title: 'My Team',
+    url: '/app/my-team',
     icon: Users,
-    roles: ['ADMIN', 'MANAGER'],
   },
 ]
 
+// Admin menu items
 const adminNavItems = [
+  {
+    title: 'Dashboard',
+    url: '/app/dashboard',
+    icon: LayoutDashboard,
+  },
   {
     title: 'User Management',
     url: '/app/admin',
-    icon: ShieldCheck,
-    roles: ['ADMIN'],
+    icon: UserCog,
+  },
+  {
+    title: 'Master Data',
+    url: '/app/master-data',
+    icon: Database,
+  },
+  {
+    title: 'Audit Trails',
+    url: '/app/audit-trails',
+    icon: FileSearch,
+  },
+  {
+    title: 'App Settings',
+    url: '/app/app-settings',
+    icon: Cog,
   },
 ]
 
@@ -118,17 +157,21 @@ export function AppSidebar({ user, children }: AppSidebarProps) {
     return pathname.startsWith(url)
   }
 
-  const filteredMainNav = mainNavItems.filter((item) =>
-    item.roles.includes(user.role)
-  )
+  // Get menu items based on role
+  const getNavItems = () => {
+    if (user.role === 'ADMIN') return adminNavItems
+    if (user.role === 'MANAGER') return managerNavItems
+    return employeeNavItems
+  }
 
-  const filteredManagerNav = managerNavItems.filter((item) =>
-    item.roles.includes(user.role)
-  )
+  const navItems = getNavItems()
 
-  const filteredAdminNav = adminNavItems.filter((item) =>
-    item.roles.includes(user.role)
-  )
+  // Get role display name
+  const getRoleDisplayName = () => {
+    if (user.role === 'ADMIN') return 'Super Admin'
+    if (user.role === 'MANAGER') return 'Manager'
+    return 'Employee'
+  }
 
   return (
     <SidebarProvider>
@@ -136,7 +179,7 @@ export function AppSidebar({ user, children }: AppSidebarProps) {
         <SidebarHeader>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton size="lg" asChild>
+              <SidebarMenuButton size="lg" asChild className="hover:bg-transparent active:bg-transparent">
                 <Link href="/app/dashboard">
                   <div className="flex aspect-square size-8 items-center justify-center rounded-lg overflow-hidden bg-white">
                     <Image 
@@ -163,7 +206,7 @@ export function AppSidebar({ user, children }: AppSidebarProps) {
             <SidebarGroupLabel>Main Menu</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {filteredMainNav.map((item) => (
+                {navItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
                       asChild
@@ -180,54 +223,6 @@ export function AppSidebar({ user, children }: AppSidebarProps) {
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
-
-          {filteredManagerNav.length > 0 && (
-            <SidebarGroup>
-              <SidebarGroupLabel>Management</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {filteredManagerNav.map((item) => (
-                    <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton
-                        asChild
-                        isActive={isActive(item.url)}
-                        tooltip={item.title}
-                      >
-                        <Link href={item.url}>
-                          <item.icon />
-                          <span>{item.title}</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          )}
-
-          {filteredAdminNav.length > 0 && (
-            <SidebarGroup>
-              <SidebarGroupLabel>Administration</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {filteredAdminNav.map((item) => (
-                    <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton
-                        asChild
-                        isActive={isActive(item.url)}
-                        tooltip={item.title}
-                      >
-                        <Link href={item.url}>
-                          <item.icon />
-                          <span>{item.title}</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          )}
         </SidebarContent>
         <SidebarFooter>
           <SidebarMenu>
@@ -267,7 +262,7 @@ export function AppSidebar({ user, children }: AppSidebarProps) {
                     <div className="flex flex-col">
                       <span className="text-sm font-medium">{user.name}</span>
                       <Badge variant="secondary" className="w-fit text-xs">
-                        {user.role}
+                        {getRoleDisplayName()}
                       </Badge>
                     </div>
                   </div>
@@ -313,10 +308,15 @@ function formatPathname(pathname: string): string {
   if (pathname === '/app/logs') return 'My Logs'
   if (pathname.startsWith('/app/logs/')) return 'Log Details'
   if (pathname === '/app/career') return 'Career Path'
-  if (pathname === '/app/team-review') return 'Team Review'
-  if (pathname.startsWith('/app/team-review/')) return 'Review Details'
+  if (pathname === '/app/team-review') return 'Team Activity'
+  if (pathname.startsWith('/app/team-review/')) return 'Activity Details'
+  if (pathname === '/app/team-performance') return 'Team Performance'
+  if (pathname === '/app/my-team') return 'My Team'
   if (pathname === '/app/settings') return 'Settings'
   if (pathname === '/app/admin') return 'User Management'
+  if (pathname === '/app/master-data') return 'Master Data'
+  if (pathname === '/app/audit-trails') return 'Audit Trails'
+  if (pathname === '/app/app-settings') return 'App Settings'
   return pathname
     .split('/')
     .filter(Boolean)

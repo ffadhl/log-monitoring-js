@@ -597,7 +597,7 @@ export function AdminClient({ initialUsers, managers }: AdminClientProps) {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">No Manager</SelectItem>
-                  {managers.map((manager) => (
+                  {managers.filter((m) => m.role !== 'ADMIN').map((manager) => (
                     <SelectItem key={manager.id} value={manager.id}>
                       {manager.name} ({manager.role})
                     </SelectItem>
@@ -691,7 +691,7 @@ export function AdminClient({ initialUsers, managers }: AdminClientProps) {
                 <SelectContent>
                   <SelectItem value="none">No Manager</SelectItem>
                   {managers
-                    .filter((m) => m.id !== selectedUser?.id)
+                    .filter((m) => m.id !== selectedUser?.id && m.role !== 'ADMIN')
                     .map((manager) => (
                       <SelectItem key={manager.id} value={manager.id}>
                         {manager.name} ({manager.role})

@@ -67,7 +67,7 @@ export function DashboardClient({
       value: stats.logsThisWeek,
       icon: Calendar,
       description: 'Logs this week',
-      trend: `${7 - stats.logsThisWeek} days remaining`,
+      trend: `${Math.max(5 - stats.logsThisWeek, 0)} work days left`,
       color: 'text-emerald-600',
       bgColor: 'bg-emerald-50',
     },
@@ -132,21 +132,21 @@ export function DashboardClient({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="size-5 text-muted-foreground" />
-              Weekly Progress
+              Work Week Progress
             </CardTitle>
             <CardDescription>
-              Your logging progress this week
+              Your logging progress this week (Mon-Fri)
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-6">
-              {/* Progress Bar */}
+              {/* Progress Bar - 5 working days */}
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Days Logged</span>
-                  <span className="font-medium">{stats.logsThisWeek} / 7 days</span>
+                  <span className="font-medium">{Math.min(stats.logsThisWeek, 5)} / 5 days</span>
                 </div>
-                <Progress value={(stats.logsThisWeek / 7) * 100} className="h-3" />
+                <Progress value={Math.min((stats.logsThisWeek / 5) * 100, 100)} className="h-3" />
               </div>
               
               {/* Stats Summary */}
@@ -156,8 +156,8 @@ export function DashboardClient({
                   <p className="text-sm text-muted-foreground">Logs this week</p>
                 </div>
                 <div className="p-4 rounded-lg bg-muted/50">
-                  <p className="text-2xl font-bold">{7 - stats.logsThisWeek}</p>
-                  <p className="text-sm text-muted-foreground">Days remaining</p>
+                  <p className="text-2xl font-bold">{Math.max(5 - stats.logsThisWeek, 0)}</p>
+                  <p className="text-sm text-muted-foreground">Work days left</p>
                 </div>
               </div>
 

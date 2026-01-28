@@ -4,6 +4,8 @@
 import {
   startOfWeek,
   endOfWeek,
+  startOfDay,
+  endOfDay,
   format,
   getWeek,
   getYear,
@@ -23,6 +25,16 @@ export function getWeekStart(date: Date): Date {
 // Get the end of week (Sunday)
 export function getWeekEnd(date: Date): Date {
   return endOfWeek(date, { weekStartsOn: 1 })
+}
+
+// Get the start of day
+export function getStartOfDay(date: Date): Date {
+  return startOfDay(date)
+}
+
+// Get the end of day
+export function getEndOfDay(date: Date): Date {
+  return endOfDay(date)
 }
 
 // Get week number

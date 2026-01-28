@@ -13,6 +13,8 @@ import {
   Clock,
   Pause,
   Flag,
+  Eye,
+  Calendar,
 } from 'lucide-react'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -32,6 +34,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet'
 import {
   Select,
   SelectContent,
@@ -56,6 +65,7 @@ export function CareerClient({ goals: initialGoals }: CareerClientProps) {
   const [goals, setGoals] = useState(initialGoals)
   const [isAddingGoal, setIsAddingGoal] = useState(false)
   const [editingGoal, setEditingGoal] = useState<CareerGoal | null>(null)
+  const [viewingGoal, setViewingGoal] = useState<CareerGoal | null>(null)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [targetDate, setTargetDate] = useState<Date | undefined>()
@@ -305,25 +315,6 @@ export function CareerClient({ goals: initialGoals }: CareerClientProps) {
         </Card>
       </div>
 
-      {/* Progress Overview */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Overall Progress</CardTitle>
-          <CardDescription>
-            Your career goals completion rate
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center gap-4">
-            <Progress value={completionPercentage} className="flex-1" />
-            <span className="text-lg font-semibold">{completionPercentage}%</span>
-          </div>
-          <p className="text-sm text-muted-foreground mt-2">
-            {stats.completed} of {stats.total} goals completed
-          </p>
-        </CardContent>
-      </Card>
-
       {/* Filter */}
       <div className="flex items-center gap-2">
         <span className="text-sm text-muted-foreground">Filter:</span>
@@ -406,6 +397,15 @@ export function CareerClient({ goals: initialGoals }: CareerClientProps) {
                     </>
                   )}
                   <div className="flex items-center gap-2 pt-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => setViewingGoal(goal)}
+                    >
+                      <Eye className="size-4 mr-1" />
+                      Detail
+                    </Button>
                     <Button
                       variant="outline"
                       size="sm"
@@ -527,6 +527,112 @@ export function CareerClient({ goals: initialGoals }: CareerClientProps) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Goal Detail Sheet */}
+      <Sheet open={!!viewingGoal} onOpenChange={(open) => !open && setViewingGoal(null)}>
+        <SheetContent className="w-full sm:max-w-lg overflow-auto">
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-3">
+              {viewingGoal && (
+                <>
+                  {React.createElement(statusIcons[viewingGoal.status], {
+                    className: `size-6 ${
+                      viewingGoal.status === 'COMPLETED'
+                        ? 'text-emerald-500'
+                        : viewingGoal.status === 'IN_PROGRESS'
+                        ? 'text-blue-500'
+                        : viewingGoal.status === 'ON_HOLD'
+                        ? 'text-amber-500'
+                        : 'text-slate-400'
+                    }`
+                  })}
+                  <span>{viewingGoal.title}</span>
+                </>
+              )}
+            </SheetTitle>
+            <SheetDescription>
+              Career goal details and progress
+            </SheetDescription>
+          </SheetHeader>
+          {viewingGoal && (
+            <div className="mt-6 space-y-6">
+              {/* Status Badge */}
+              <div className="flex items-center gap-2">
+                <Badge
+                  variant="secondary"
+                  className={`${GOAL_STATUS_CONFIG[viewingGoal.status].color}`}
+                >
+                  {GOAL_STATUS_CONFIG[viewingGoal.status].label}
+                </Badge>
+                {viewingGoal.targetDate && (
+                  <Badge variant="outline" className="text-muted-foreground">
+                    <Calendar className="size-3 mr-1" />
+                    Target: {new Date(viewingGoal.targetDate).getFullYear()}
+                  </Badge>
+                )}
+              </div>
+
+              <Separator />
+
+              {/* Description */}
+              <div className="space-y-2">
+                <h4 className="text-sm font-semibold text-muted-foreground">Description</h4>
+                <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                  {viewingGoal.description}
+                </p>
+              </div>
+
+              {/* Manager Feedback */}
+              {viewingGoal.managerComment && (
+                <>
+                  <Separator />
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-semibold flex items-center gap-2">
+                      <MessageSquare className="size-4 text-muted-foreground" />
+                      Manager Feedback
+                    </h4>
+                    <div className="p-4 rounded-lg bg-muted/50 border">
+                      <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                        {viewingGoal.managerComment}
+                      </p>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* Timestamps */}
+              <Separator />
+              <div className="space-y-2 text-xs text-muted-foreground">
+                <p>Created: {new Date(viewingGoal.createdAt).toLocaleDateString('id-ID', { 
+                  day: 'numeric', 
+                  month: 'long', 
+                  year: 'numeric' 
+                })}</p>
+                <p>Last updated: {new Date(viewingGoal.updatedAt).toLocaleDateString('id-ID', { 
+                  day: 'numeric', 
+                  month: 'long', 
+                  year: 'numeric' 
+                })}</p>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-2 pt-4">
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => {
+                    setViewingGoal(null)
+                    openEditDialog(viewingGoal)
+                  }}
+                >
+                  <Edit className="size-4 mr-2" />
+                  Edit Goal
+                </Button>
+              </div>
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
     </div>
   )
 }

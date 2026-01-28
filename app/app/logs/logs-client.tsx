@@ -257,7 +257,7 @@ export function LogsClient({
                       Week {week.weekNumber}, {week.year}
                       {week.isCurrent && <span className="ml-2 text-xs bg-primary/20 px-2 py-0.5 rounded">Current</span>}
                     </span>
-                    <span className="text-xs text-muted-foreground">
+                    <span className={`text-xs ${currentWeekInfo.weekNumber === week.weekNumber && currentWeekInfo.year === week.year ? 'text-primary-foreground/80' : 'text-muted-foreground'}`}>
                       {formatDateRange(week.startDate, week.endDate)}
                     </span>
                   </div>
@@ -283,19 +283,6 @@ export function LogsClient({
 
         {/* Daily View Tab */}
         <TabsContent value="daily" className="space-y-6">
-          {/* Progress Bar */}
-          <Card>
-            <CardContent className="py-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium">Weekly Completion</span>
-                <span className="text-sm text-muted-foreground">
-                  {currentLogs.length} / 7 days
-                </span>
-              </div>
-              <Progress value={completionPercentage} />
-            </CardContent>
-          </Card>
-
           {/* Days Grid */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {daysInWeek.map((day) => {

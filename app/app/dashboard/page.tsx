@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { DashboardClient } from './dashboard-client'
 import { ManagerDashboard } from './manager-dashboard'
 import { AdminDashboard } from './admin-dashboard'
-import { getCurrentWeekInfo, getDaysInWeek, getShortDayName, isSameDayCheck } from '@/lib/date-utils'
+import { getCurrentWeekInfo, getDaysInWeek, getShortDayName, isSameDayCheck, getStartOfDay, getEndOfDay } from '@/lib/date-utils'
 
 export default async function DashboardPage() {
   const session = await getSession()
@@ -114,10 +114,15 @@ export default async function DashboardPage() {
 
   // Manager Dashboard
   if (session.role === 'MANAGER') {
+    const today = new Date()
+    const todayStart = getStartOfDay(today)
+    const todayEnd = getEndOfDay(today)
+
     const [
       subordinates,
       pendingReports,
       reviewedThisWeek,
+      todayLogs,
     ] = await Promise.all([
       prisma.user.findMany({
         where: { managerId: session.id },
@@ -175,6 +180,19 @@ export default async function DashboardPage() {
           updatedAt: { gte: startDate, lte: endDate },
         },
       }),
+      // Fetch today's logs from all subordinates
+      prisma.dailyLog.findMany({
+        where: {
+          user: { managerId: session.id },
+          date: { gte: todayStart, lte: todayEnd },
+        },
+        include: {
+          user: {
+            select: { id: true, name: true, email: true },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+      }),
     ])
 
     const totalGoalsTracking = subordinates.reduce(
@@ -200,6 +218,7 @@ export default async function DashboardPage() {
         subordinates={subordinates}
         pendingReports={pendingReports}
         teamActivityData={teamActivityData}
+        todayLogs={todayLogs}
       />
     )
   }

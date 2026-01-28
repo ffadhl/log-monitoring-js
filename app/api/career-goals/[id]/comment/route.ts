@@ -58,3 +58,50 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ error: 'Failed to add comment' }, { status: 500 })
   }
 }
+
+// DELETE /api/career-goals/[id]/comment - Delete manager comment from a career goal
+export async function DELETE(request: NextRequest, { params }: RouteParams) {
+  try {
+    const session = await getSession()
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Only managers can delete comments
+    if (!isManager(session.role)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    const { id } = await params
+
+    // Find the goal
+    const existingGoal = await prisma.careerGoal.findUnique({
+      where: { id },
+      include: { user: true },
+    })
+
+    if (!existingGoal) {
+      return NextResponse.json({ error: 'Goal not found' }, { status: 404 })
+    }
+
+    // Check if this manager can delete comment on this goal
+    if (existingGoal.user.managerId !== session.id) {
+      return NextResponse.json(
+        { error: 'You can only delete comments on goals from your subordinates' },
+        { status: 403 }
+      )
+    }
+
+    const goal = await prisma.careerGoal.update({
+      where: { id },
+      data: {
+        managerComment: null,
+      },
+    })
+
+    return NextResponse.json({ goal })
+  } catch (error) {
+    console.error('Failed to delete comment:', error)
+    return NextResponse.json({ error: 'Failed to delete comment' }, { status: 500 })
+  }
+}

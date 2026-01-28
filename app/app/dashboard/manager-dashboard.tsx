@@ -9,6 +9,11 @@ import {
   TrendingUp,
   Target,
   Eye,
+  FileText,
+  Calendar,
+  ArrowRight,
+  ClipboardList,
+  MessageSquare,
 } from 'lucide-react'
 import Link from 'next/link'
 import {
@@ -28,7 +33,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { formatDateRange } from '@/lib/date-utils'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { formatDateRange, formatDate } from '@/lib/date-utils'
 import { REPORT_STATUS_CONFIG } from '@/lib/types'
 
 interface Subordinate {
@@ -55,6 +61,18 @@ interface Subordinate {
   }[]
 }
 
+interface TodayLog {
+  id: string
+  content: string
+  mood: string | null
+  date: Date
+  user: {
+    id: string
+    name: string
+    email: string
+  }
+}
+
 interface ManagerDashboardProps {
   userName: string
   stats: {
@@ -78,6 +96,7 @@ interface ManagerDashboardProps {
     }
   }[]
   teamActivityData: { name: string; logs: number }[]
+  todayLogs: TodayLog[]
 }
 
 export function ManagerDashboard({
@@ -86,6 +105,7 @@ export function ManagerDashboard({
   subordinates,
   pendingReports,
   teamActivityData,
+  todayLogs,
 }: ManagerDashboardProps) {
   const getInitials = (name: string) => {
     return name
@@ -123,32 +143,32 @@ export function ManagerDashboard({
       value: stats.totalSubordinates,
       icon: Users,
       description: 'Under your supervision',
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
+      color: 'text-primary',
+      bgColor: 'bg-primary/10',
     },
     {
       title: 'Pending Reviews',
       value: stats.pendingReviews,
       icon: AlertCircle,
       description: 'Reports awaiting review',
-      color: 'text-amber-600',
-      bgColor: 'bg-amber-50',
+      color: 'text-primary',
+      bgColor: 'bg-primary/10',
     },
     {
       title: 'Reviewed This Week',
       value: stats.reviewedThisWeek,
       icon: CheckCircle,
       description: 'Reports reviewed',
-      color: 'text-emerald-600',
-      bgColor: 'bg-emerald-50',
+      color: 'text-primary',
+      bgColor: 'bg-primary/10',
     },
     {
       title: 'Goals Tracking',
       value: stats.totalGoalsTracking,
       icon: Target,
       description: 'Team career goals',
-      color: 'text-violet-600',
-      bgColor: 'bg-violet-50',
+      color: 'text-primary',
+      bgColor: 'bg-primary/10',
     },
   ]
 
@@ -157,11 +177,79 @@ export function ManagerDashboard({
       {/* Welcome Section */}
       <div>
         <h1 className="text-3xl font-bold tracking-tight">
-          Team Overview, {userName.split(' ')[0]}! 👋
+          Welcome back, {userName.split(' ')[0]}! 👋
         </h1>
         <p className="text-muted-foreground mt-2">
-          Monitor your team&apos;s progress and review their weekly reports
+          Monitor your team&apos;s daily activities, review weekly reports, and track career development progress.
         </p>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+        <Link href="/app/team-review?tab=daily-logs">
+          <Card className="group cursor-pointer hover:shadow-md transition-all duration-200">
+            <CardContent className="pt-4 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-muted group-hover:bg-primary/10 transition-colors">
+                  <FileText className="size-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">View Daily Logs</p>
+                  <p className="text-xs text-muted-foreground">Team activities</p>
+                </div>
+                <ArrowRight className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+        <Link href="/app/team-review?tab=pending">
+          <Card className="group cursor-pointer hover:shadow-md transition-all duration-200">
+            <CardContent className="pt-4 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-muted group-hover:bg-primary/10 transition-colors">
+                  <ClipboardList className="size-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">Review Reports</p>
+                  <p className="text-xs text-muted-foreground">{stats.pendingReviews} pending</p>
+                </div>
+                <ArrowRight className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+        <Link href="/app/team-review?tab=team">
+          <Card className="group cursor-pointer hover:shadow-md transition-all duration-200">
+            <CardContent className="pt-4 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-muted group-hover:bg-primary/10 transition-colors">
+                  <MessageSquare className="size-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">Career Feedback</p>
+                  <p className="text-xs text-muted-foreground">Goal reviews</p>
+                </div>
+                <ArrowRight className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+        <Link href="/app/my-team">
+          <Card className="group cursor-pointer hover:shadow-md transition-all duration-200">
+            <CardContent className="pt-4 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-muted group-hover:bg-primary/10 transition-colors">
+                  <Users className="size-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">My Team</p>
+                  <p className="text-xs text-muted-foreground">{stats.totalSubordinates} members</p>
+                </div>
+                <ArrowRight className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
       </div>
 
       {/* Stats Grid */}
@@ -186,6 +274,75 @@ export function ManagerDashboard({
         ))}
       </div>
 
+      {/* Today's Logs - Priority Section */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="size-5 text-muted-foreground" />
+                Today&apos;s Logs
+              </CardTitle>
+              <CardDescription>
+                {formatDate(new Date(), 'EEEE, MMMM d, yyyy')} - Team member activities
+              </CardDescription>
+            </div>
+            <Badge variant="outline" className="text-muted-foreground">
+              {todayLogs.length} {todayLogs.length === 1 ? 'log' : 'logs'}
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {todayLogs.length > 0 ? (
+            <ScrollArea className="h-[300px]">
+              <div className="space-y-4 pr-4">
+                {todayLogs.map((log) => (
+                  <div
+                    key={log.id}
+                    className="p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
+                  >
+                    <div className="flex items-start gap-3">
+                      <Avatar className="size-10">
+                        <AvatarFallback className="bg-primary/10 text-primary text-sm">
+                          {getInitials(log.user.name)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="text-sm font-medium">{log.user.name}</p>
+                          <div className="flex items-center gap-2">
+                            {log.mood && (
+                              <span className="text-lg" title="Mood">
+                                {log.mood}
+                              </span>
+                            )}
+                            <span className="text-xs text-muted-foreground">
+                              {formatDate(log.date, 'HH:mm')}
+                            </span>
+                          </div>
+                        </div>
+                        <p className="text-xs text-muted-foreground mb-2">{log.user.email}</p>
+                        <div className="p-3 rounded-md bg-muted/50">
+                          <p className="text-sm whitespace-pre-wrap">{log.content}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+          ) : (
+            <div className="text-center py-12">
+              <FileText className="size-12 mx-auto text-muted-foreground/50" />
+              <h3 className="mt-4 text-lg font-semibold">No logs yet today</h3>
+              <p className="text-sm text-muted-foreground mt-2">
+                Team members haven&apos;t submitted any logs for today
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Charts Row */}
       <div className="grid gap-6 lg:grid-cols-7">
         {/* Team Activity Chart */}
@@ -204,15 +361,15 @@ export function ManagerDashboard({
               {teamActivityData && teamActivityData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={teamActivityData}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" vertical={false} />
                     <XAxis
                       dataKey="name"
-                      tick={{ fontSize: 12 }}
+                      tick={{ fontSize: 12, fill: '#64748b' }}
                       tickLine={false}
                       axisLine={false}
                     />
                     <YAxis
-                      tick={{ fontSize: 12 }}
+                      tick={{ fontSize: 12, fill: '#64748b' }}
                       tickLine={false}
                       axisLine={false}
                       allowDecimals={false}
