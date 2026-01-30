@@ -125,7 +125,7 @@ export function WeeklyLogForm({ onSubmit, onCancel, initialData, isEdit, logId }
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
   }
 
-  const uploadAttachments = async (weeklyLogId: string) => {
+  const uploadAttachments = async (weeklyReportId: string) => {
     const filesToUpload = attachments.filter(a => a.file)
     
     for (const attachment of filesToUpload) {
@@ -134,7 +134,7 @@ export function WeeklyLogForm({ onSubmit, onCancel, initialData, isEdit, logId }
       const formData = new FormData()
       formData.append('file', attachment.file)
       
-      await fetch(`/api/weekly-logs/${weeklyLogId}/attachments`, {
+      await fetch(`/api/weekly-reports/${weeklyReportId}/attachments`, {
         method: 'POST',
         body: formData,
       })

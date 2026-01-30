@@ -17,6 +17,10 @@ import {
   ClipboardCheck,
   ChevronDown,
   Trash2,
+  Paperclip,
+  FileText,
+  Download,
+  History,
 } from 'lucide-react'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -84,10 +88,11 @@ interface DailyLog {
 interface TeamReviewClientProps {
   subordinates: TeamMember[]
   pendingReports: (WeeklyReport & { user: User })[]
+  reviewedReports: (WeeklyReport & { user: User })[]
   teamDailyLogs: DailyLog[]
 }
 
-export function TeamReviewClient({ subordinates, pendingReports, teamDailyLogs }: TeamReviewClientProps) {
+export function TeamReviewClient({ subordinates, pendingReports, reviewedReports, teamDailyLogs }: TeamReviewClientProps) {
   const searchParams = useSearchParams()
   const router = useRouter()
   const defaultTab = searchParams.get('tab') || 'daily-logs'
@@ -103,6 +108,7 @@ export function TeamReviewClient({ subordinates, pendingReports, teamDailyLogs }
   const [savingGoalId, setSavingGoalId] = useState<string | null>(null)
   const [selectedMemberFilter, setSelectedMemberFilter] = useState<string>('all')
   const [expandedDates, setExpandedDates] = useState<string[]>([])
+  const [viewingReport, setViewingReport] = useState<(WeeklyReport & { user: User }) | null>(null)
 
   const stats = {
     teamSize: subordinates.length,
@@ -296,7 +302,7 @@ export function TeamReviewClient({ subordinates, pendingReports, teamDailyLogs }
       </div>
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3 h-12 p-1 bg-muted/50">
+        <TabsList className="grid w-full grid-cols-4 h-12 p-1 bg-muted/50">
           <TabsTrigger 
             value="daily-logs" 
             className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground font-medium"
@@ -310,8 +316,8 @@ export function TeamReviewClient({ subordinates, pendingReports, teamDailyLogs }
             className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground font-medium"
           >
             <ClipboardCheck className="size-4" />
-            <span className="hidden sm:inline">Weekly Reviews</span>
-            <span className="sm:hidden">Reviews</span>
+            <span className="hidden sm:inline">Pending</span>
+            <span className="sm:hidden">Pending</span>
             {stats.pendingReviews > 0 && (
               <Badge variant="destructive" className="ml-1 h-5 px-1.5 text-xs">
                 {stats.pendingReviews}
@@ -319,11 +325,19 @@ export function TeamReviewClient({ subordinates, pendingReports, teamDailyLogs }
             )}
           </TabsTrigger>
           <TabsTrigger 
+            value="history" 
+            className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground font-medium"
+          >
+            <History className="size-4" />
+            <span className="hidden sm:inline">History</span>
+            <span className="sm:hidden">History</span>
+          </TabsTrigger>
+          <TabsTrigger 
             value="team" 
             className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground font-medium"
           >
             <Target className="size-4" />
-            <span className="hidden sm:inline">Career Goals</span>
+            <span className="hidden sm:inline">Goals</span>
             <span className="sm:hidden">Goals</span>
           </TabsTrigger>
         </TabsList>
@@ -505,6 +519,75 @@ export function TeamReviewClient({ subordinates, pendingReports, teamDailyLogs }
           )}
         </TabsContent>
 
+        {/* History Tab - Reviewed Reports */}
+        <TabsContent value="history" className="space-y-4">
+          {reviewedReports.length > 0 ? (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {reviewedReports.map((report) => (
+                <Card key={report.id} className="hover:shadow-md transition-all">
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="size-12">
+                        <AvatarFallback className="bg-emerald-100 text-emerald-700">
+                          {getInitials(report.user.name)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <CardTitle className="text-base truncate">
+                          {report.user.name}
+                        </CardTitle>
+                        <CardDescription className="truncate">
+                          {report.user.email}
+                        </CardDescription>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">
+                        Week {report.weekNumber}, {report.year}
+                      </span>
+                      <Badge
+                        variant="secondary"
+                        className={REPORT_STATUS_CONFIG[report.status].color}
+                      >
+                        {REPORT_STATUS_CONFIG[report.status].label}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {formatDateRange(report.startDate, report.endDate)}
+                    </p>
+                    {report.managerFeedback && (
+                      <div className="p-2 rounded-lg bg-muted/50 border">
+                        <p className="text-xs text-muted-foreground mb-1">Your feedback:</p>
+                        <p className="text-sm line-clamp-2">{report.managerFeedback}</p>
+                      </div>
+                    )}
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => setViewingReport(report)}
+                    >
+                      <Eye className="size-4 mr-2" />
+                      View Details
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <Card>
+              <CardContent className="py-12 text-center">
+                <History className="size-12 mx-auto text-muted-foreground/50" />
+                <h3 className="mt-4 text-lg font-semibold">No review history</h3>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Reports you have reviewed will appear here
+                </p>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
         {/* Team Career Goals Tab */}
         <TabsContent value="team" className="space-y-4">
           {subordinates.length > 0 ? (
@@ -625,6 +708,31 @@ export function TeamReviewClient({ subordinates, pendingReports, teamDailyLogs }
                 </div>
               )}
 
+              {/* Attachments Section */}
+              {selectedReport.attachments && selectedReport.attachments.length > 0 && (
+                <div className="space-y-2">
+                  <Label className="text-muted-foreground flex items-center gap-2">
+                    <Paperclip className="size-4" />
+                    Attachments ({selectedReport.attachments.length})
+                  </Label>
+                  <div className="space-y-2">
+                    {selectedReport.attachments.map((attachment) => (
+                      <a
+                        key={attachment.id}
+                        href={attachment.fileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
+                      >
+                        <FileText className="size-5 text-muted-foreground" />
+                        <span className="text-sm flex-1 truncate">{attachment.fileName}</span>
+                        <Download className="size-4 text-muted-foreground" />
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <Separator />
 
               <div className="space-y-2">
@@ -648,6 +756,108 @@ export function TeamReviewClient({ subordinates, pendingReports, teamDailyLogs }
             >
               <Send className="size-4 mr-2" />
               {isSaving ? 'Submitting...' : 'Submit Review'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* View Reviewed Report Dialog */}
+      <Dialog open={!!viewingReport} onOpenChange={(open) => !open && setViewingReport(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CheckCircle className="size-5 text-emerald-600" />
+              Weekly Report (Reviewed)
+            </DialogTitle>
+            <DialogDescription>
+              {viewingReport && (
+                <>
+                  {viewingReport.user.name} - Week {viewingReport.weekNumber},{' '}
+                  {viewingReport.year}
+                </>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          {viewingReport && (
+            <div className="space-y-6 py-4">
+              <div className="space-y-2">
+                <Label className="text-muted-foreground">Period</Label>
+                <p className="text-sm">
+                  {formatDateRange(viewingReport.startDate, viewingReport.endDate)}
+                </p>
+              </div>
+
+              {viewingReport.summary && (
+                <div className="space-y-2">
+                  <Label className="text-muted-foreground">Weekly Summary</Label>
+                  <div className="p-4 rounded-lg bg-muted/50 border">
+                    <p className="text-sm whitespace-pre-wrap">{viewingReport.summary}</p>
+                  </div>
+                </div>
+              )}
+
+              {viewingReport.dailyLogs && viewingReport.dailyLogs.length > 0 && (
+                <div className="space-y-2">
+                  <Label className="text-muted-foreground">Daily Logs ({viewingReport.dailyLogs.length})</Label>
+                  <ScrollArea className="h-48">
+                    <div className="space-y-2">
+                      {viewingReport.dailyLogs.map((log) => (
+                        <div key={log.id} className="p-3 rounded-lg border bg-card">
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
+                            <Calendar className="size-4" />
+                            {formatDate(log.date, 'EEEE, MMM d')}
+                            {log.mood && <span className="ml-auto text-lg">{log.mood}</span>}
+                          </div>
+                          <p className="text-sm">{log.content}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </div>
+              )}
+
+              {/* Attachments Section */}
+              {viewingReport.attachments && viewingReport.attachments.length > 0 && (
+                <div className="space-y-2">
+                  <Label className="text-muted-foreground flex items-center gap-2">
+                    <Paperclip className="size-4" />
+                    Attachments ({viewingReport.attachments.length})
+                  </Label>
+                  <div className="space-y-2">
+                    {viewingReport.attachments.map((attachment) => (
+                      <a
+                        key={attachment.id}
+                        href={attachment.fileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
+                      >
+                        <FileText className="size-5 text-muted-foreground" />
+                        <span className="text-sm flex-1 truncate">{attachment.fileName}</span>
+                        <Download className="size-4 text-muted-foreground" />
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <Separator />
+
+              {/* Manager Feedback */}
+              <div className="space-y-2">
+                <Label className="text-muted-foreground flex items-center gap-2">
+                  <MessageSquare className="size-4" />
+                  Your Feedback
+                </Label>
+                <div className="p-4 rounded-lg bg-emerald-50 border border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800">
+                  <p className="text-sm whitespace-pre-wrap">{viewingReport.managerFeedback || 'No feedback provided'}</p>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setViewingReport(null)}>
+              Close
             </Button>
           </DialogFooter>
         </DialogContent>

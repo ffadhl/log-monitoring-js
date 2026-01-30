@@ -56,8 +56,28 @@ export default async function TeamReviewPage() {
       dailyLogs: {
         orderBy: { date: 'asc' },
       },
+      attachments: true,
     },
     orderBy: [{ year: 'desc' }, { weekNumber: 'desc' }],
+  })
+
+  // Fetch reviewed reports (history)
+  const reviewedReports = await prisma.weeklyReport.findMany({
+    where: {
+      status: 'REVIEWED',
+      user: {
+        managerId: session.id,
+      },
+    },
+    include: {
+      user: true,
+      dailyLogs: {
+        orderBy: { date: 'asc' },
+      },
+      attachments: true,
+    },
+    orderBy: [{ year: 'desc' }, { weekNumber: 'desc' }],
+    take: 20, // Limit to last 20 reviewed reports
   })
 
   // Fetch daily logs from team members for current week
@@ -87,6 +107,7 @@ export default async function TeamReviewPage() {
     <TeamReviewClient
       subordinates={subordinates}
       pendingReports={pendingReports}
+      reviewedReports={reviewedReports}
       teamDailyLogs={teamDailyLogs}
     />
   )

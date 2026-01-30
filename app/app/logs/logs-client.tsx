@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import {
   Plus,
   Calendar,
@@ -13,6 +13,9 @@ import {
   Edit,
   MessageSquare,
   CheckCircle,
+  Upload,
+  Loader2,
+  X,
 } from 'lucide-react'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -82,6 +85,8 @@ export function LogsClient({
   const [currentWeekInfo] = useState(weekInfo)
   const [currentLogs, setCurrentLogs] = useState(dailyLogs)
   const [currentReport, setCurrentReport] = useState(weeklyReport)
+  const [isUploading, setIsUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const getLogsForDay = (dayStr: string) => {
     return currentLogs.filter((log) => isSameDayCheck(log.date, dayStr))
@@ -212,6 +217,72 @@ export function LogsClient({
     setEditingLog(log)
     setLogContent(log.content)
     setSelectedMood(log.mood || '')
+  }
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files || files.length === 0 || !currentReport) return
+
+    setIsUploading(true)
+    
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i]
+        
+        // Validate file size (10MB max)
+        if (file.size > 10 * 1024 * 1024) {
+          alert(`File "${file.name}" terlalu besar. Maksimal 10MB.`)
+          continue
+        }
+
+        const formData = new FormData()
+        formData.append('file', file)
+
+        const response = await fetch(`/api/weekly-reports/${currentReport.id}/attachments`, {
+          method: 'POST',
+          body: formData,
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          setCurrentReport({
+            ...currentReport,
+            attachments: [...(currentReport.attachments || []), data.attachment],
+          })
+        } else {
+          const error = await response.json()
+          alert(error.error || 'Gagal upload file')
+        }
+      }
+    } catch (error) {
+      console.error('Failed to upload file:', error)
+      alert('Gagal upload file')
+    } finally {
+      setIsUploading(false)
+      // Reset input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+    }
+  }
+
+  const handleDeleteAttachment = async (attachmentId: string) => {
+    if (!currentReport) return
+    
+    try {
+      const response = await fetch(`/api/weekly-reports/${currentReport.id}/attachments?attachmentId=${attachmentId}`, {
+        method: 'DELETE',
+      })
+
+      if (response.ok) {
+        setCurrentReport({
+          ...currentReport,
+          attachments: currentReport.attachments?.filter(a => a.id !== attachmentId) || [],
+        })
+      }
+    } catch (error) {
+      console.error('Failed to delete attachment:', error)
+    }
   }
 
   const completionPercentage = (currentLogs.length / 7) * 100
@@ -565,12 +636,27 @@ export function LogsClient({
                       {currentReport.attachments.map((attachment) => (
                         <div
                           key={attachment.id}
-                          className="flex items-center gap-2 p-2 rounded-lg bg-muted/50"
+                          className="flex items-center gap-2 p-2 rounded-lg bg-muted/50 group"
                         >
                           <FileText className="size-4 text-muted-foreground" />
-                          <span className="text-sm truncate flex-1">
+                          <a
+                            href={attachment.fileUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm truncate flex-1 hover:underline"
+                          >
                             {attachment.fileName}
-                          </span>
+                          </a>
+                          {currentReport.status === 'DRAFT' && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="size-6 opacity-0 group-hover:opacity-100 transition-opacity text-destructive"
+                              onClick={() => handleDeleteAttachment(attachment.id)}
+                            >
+                              <X className="size-3" />
+                            </Button>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -579,14 +665,32 @@ export function LogsClient({
                       No attachments yet
                     </p>
                   )}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    multiple
+                    onChange={handleFileUpload}
+                    className="hidden"
+                    accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.png,.jpg,.jpeg,.gif,.webp"
+                  />
                   <Button
                     variant="outline"
                     size="sm"
                     className="w-full mt-3"
-                    disabled={!currentReport || currentReport.status !== 'DRAFT'}
+                    disabled={!currentReport || currentReport.status !== 'DRAFT' || isUploading}
+                    onClick={() => fileInputRef.current?.click()}
                   >
-                    <Plus className="size-4 mr-1" />
-                    Add Attachment
+                    {isUploading ? (
+                      <>
+                        <Loader2 className="size-4 mr-1 animate-spin" />
+                        Uploading...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="size-4 mr-1" />
+                        Add Attachment
+                      </>
+                    )}
                   </Button>
                 </CardContent>
               </Card>
